@@ -30,12 +30,10 @@ export class TodoListComponent implements OnInit {
   loadTasks() {
     this.taskService.getTasks().subscribe({
       next: (tasks) => {
-        this.tasks = tasks.map(task => ({
-          ...task,
-          createdAt: new Date(task.createdAt)
-        }));
-        this.sortedTasks = [...this.tasks];
+        this.tasks = tasks;
+        this.sortedTasks = [...tasks];
         this.sortTasks();
+        console.log('Tasks loaded:', this.tasks);
       },
       error: (error) => {
         console.error('Error loading tasks:', error);
@@ -44,18 +42,24 @@ export class TodoListComponent implements OnInit {
   }
 
   onAddTask(task: Task) {
-    const newTask = {
+    const newTask: Task = {
       ...task,
-      id: Date.now(),
-      createdAt: new Date()
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString()
     };
+    
+    console.log('Creating new task:', newTask);
     
     this.taskService.addTask(newTask).subscribe({
       next: (savedTask) => {
-        this.tasks = [...this.tasks, savedTask];
+        const taskWithStringId = {
+          ...savedTask,
+          id: savedTask.id.toString()
+        };
+        this.tasks = [...this.tasks, taskWithStringId];
         this.sortedTasks = [...this.tasks];
         this.sortTasks();
-        console.log('Tasks after adding:', this.tasks);
+        console.log('Task added successfully:', taskWithStringId);
       },
       error: (error) => {
         console.error('Error adding task:', error);
@@ -63,14 +67,15 @@ export class TodoListComponent implements OnInit {
     });
   }
 
-  onToggleComplete(taskId: number) {
-    const task = this.tasks.find(t => t.id === taskId);
+  onToggleComplete(taskId: string | number) {
+    const stringId = taskId.toString();
+    const task = this.tasks.find(t => t.id.toString() === stringId);
     if (task) {
       const updatedTask = { ...task, completed: !task.completed };
       this.taskService.updateTask(updatedTask).subscribe({
         next: () => {
           this.tasks = this.tasks.map(t => 
-            t.id === taskId ? updatedTask : t
+            t.id.toString() === stringId ? updatedTask : t
           );
           this.sortTasks();
         },
@@ -81,39 +86,65 @@ export class TodoListComponent implements OnInit {
     }
   }
 
-  onDeleteTask(taskId: number) {
+  onDeleteTask(taskId: number | string) {
     if (confirm('Are you sure you want to delete this task?')) {
-      const deletedTask = this.tasks.find(task => task.id === taskId);
+      const stringId = taskId.toString();
+      console.log('Attempting to delete task:', stringId);
       
-      this.taskService.deleteTask(taskId).subscribe({
+      const taskToDelete = this.tasks.find(task => task.id.toString() === stringId);
+      if (!taskToDelete) {
+        console.error('Task not found:', stringId);
+        return;
+      }
+
+      const previousTasks = [...this.tasks];
+      
+      this.tasks = this.tasks.filter(task => task.id.toString() !== stringId);
+      this.sortedTasks = this.sortedTasks.filter(task => task.id.toString() !== stringId);
+      this.sortTasks();
+
+      this.taskService.deleteTask(stringId).subscribe({
         next: () => {
-          this.tasks = this.tasks.filter(task => task.id !== taskId);
-          this.sortedTasks = this.sortedTasks.filter(task => task.id !== taskId);
-          
-          if (deletedTask) {
-            this.showDeleteToast(deletedTask);
-          }
-          console.log('Task deleted successfully');
+          console.log('Task deleted successfully:', stringId);
+          this.showDeleteToast(taskToDelete);
         },
         error: (error) => {
-          console.error('Error deleting task:', error);
+          console.error('Delete failed:', error);
+          this.tasks = previousTasks;
+          this.sortedTasks = [...this.tasks];
+          this.sortTasks();
         }
       });
     }
   }
 
   onEditTask(updatedTask: Task) {
-    this.taskService.updateTask(updatedTask).subscribe({
-      next: (response) => {
-        this.tasks = this.tasks.map(task => 
-          task.id === updatedTask.id ? response : task
-        );
-        this.sortedTasks = [...this.tasks];
-        this.sortTasks();
+    console.log('Editing task:', updatedTask);
+    
+    const taskToUpdate: Task = {
+      ...updatedTask,
+      id: updatedTask.id.toString(),
+      title: updatedTask.title.trim(),
+      completed: updatedTask.completed,
+      dueDate: updatedTask.dueDate,
+      dueTime: updatedTask.dueTime,
+      priority: updatedTask.priority,
+      createdAt: updatedTask.createdAt
+    };
+
+    this.tasks = this.tasks.map(task => 
+      task.id.toString() === taskToUpdate.id.toString() ? taskToUpdate : task
+    );
+    this.sortedTasks = [...this.tasks];
+    this.sortTasks();
+
+    this.taskService.updateTask(taskToUpdate).subscribe({
+      next: () => {
         console.log('Task updated successfully');
       },
       error: (error) => {
         console.error('Error updating task:', error);
+        this.loadTasks();
       }
     });
   }
@@ -122,15 +153,16 @@ export class TodoListComponent implements OnInit {
     this.sortedTasks = [...this.tasks].sort((a, b) => {
       switch (this.sortBy) {
         case 'dateAdded':
-          const dateA = new Date(a.createdAt).getTime();
-          const dateB = new Date(b.createdAt).getTime();
-          return dateB - dateA;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         case 'dueDate':
-          const dueDateA = new Date(`${a.dueDate} ${a.dueTime}`).getTime();
-          const dueDateB = new Date(`${b.dueDate} ${b.dueTime}`).getTime();
-          return dueDateA - dueDateB;
+          return new Date(`${a.dueDate} ${a.dueTime}`).getTime() - 
+                 new Date(`${b.dueDate} ${b.dueTime}`).getTime();
         case 'priority':
-          const priorityOrder = { [Priority.High]: 0, [Priority.Mid]: 1, [Priority.Low]: 2 };
+          const priorityOrder: Record<Priority, number> = { 
+            [Priority.High]: 0, 
+            [Priority.Mid]: 1, 
+            [Priority.Low]: 2 
+          };
           return priorityOrder[a.priority] - priorityOrder[b.priority];
         default:
           return 0;

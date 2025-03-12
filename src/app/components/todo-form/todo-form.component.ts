@@ -28,7 +28,7 @@ export class TodoFormComponent {
         dueDate: this.dueDate,
         dueTime: this.dueTime,
         priority: this.priority,
-        createdAt: new Date()
+        createdAt: new Date().toISOString()
       };
       
       this.addTask.emit(newTask);

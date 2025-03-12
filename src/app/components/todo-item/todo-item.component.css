@@ -81,3 +81,16 @@
 .form-control {
   margin: 5px 0;
 }
+
+.created-date {
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Make sure the line-through style applies to the creation date too */
+.task-text.completed .created-date {
+  text-decoration: line-through;
+  color: #888;
+  opacity: 0.7;
+}

@@ -14,6 +14,7 @@
     <div class="task-text" [ngClass]="{'completed': task.completed}" *ngIf="!isEditing">
       <h3>{{ task.title }}</h3>
       <p>Due: {{ task.dueDate }} {{ task.dueTime }}</p>
+      <p class="created-date">Created: {{ task.createdAt | date:'medium' }}</p>
     </div>
     <div class="edit-form" *ngIf="isEditing">
       <div class="form-control">

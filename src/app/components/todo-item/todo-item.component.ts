@@ -12,8 +12,8 @@ import { Task, Priority } from '../../models/task';
 })
 export class TodoItemComponent {
   @Input() task!: Task;
-  @Output() toggleComplete = new EventEmitter<number>();
-  @Output() deleteTask = new EventEmitter<number>();
+  @Output() toggleComplete = new EventEmitter<string | number>();
+  @Output() deleteTask = new EventEmitter<string | number>();
   @Output() editTask = new EventEmitter<Task>();
 
   Priority = Priority;
@@ -56,9 +56,12 @@ export class TodoItemComponent {
         title: this.editedTitle.trim(),
         dueDate: this.editedDueDate,
         dueTime: this.editedDueTime,
-        priority: this.editedPriority
+        priority: this.editedPriority,
+        completed: this.task.completed,
+        createdAt: this.task.createdAt
       };
-      console.log('Saving edited task:', updatedTask);
+      
+      console.log('Sending task update with ID:', updatedTask.id);
       this.editTask.emit(updatedTask);
       this.isEditing = false;
     }

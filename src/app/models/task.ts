@@ -5,11 +5,11 @@ export enum Priority {
 }
 
 export interface Task {
-  id: number;
+  id: string | number;
   title: string;
   completed: boolean;
   dueDate: string;
   dueTime: string;
-  createdAt: Date;
   priority: Priority;
+  createdAt: string;
 } 
