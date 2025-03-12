@@ -43,7 +43,6 @@ export class TaskService {
   }
 
   deleteTask(id: number | string): Observable<any> {
-    // Convert ID to string to ensure consistent handling
     const stringId = id.toString();
     const url = `${this.apiUrl}/${stringId}`;
     console.log('Deleting task at:', url);

@@ -54,27 +54,26 @@
       </div>
     </div>
   </div>
-  <div>
+  <div class="button-container">
     <button 
       *ngIf="!isEditing" 
       (click)="startEditing()" 
-      class="btn"
+      class="icon-btn"
     >
-      Edit
+      <i class="fas fa-edit"></i>
     </button>
     <button 
       *ngIf="isEditing" 
       (click)="saveEdit()" 
-      class="btn"
+      class="icon-btn"
     >
-      Save
+      <i class="fas fa-save"></i>
     </button>
     <button 
       (click)="onDelete()" 
-      class="btn" 
-      style="background: red"
+      class="icon-btn"
     >
-      Delete
+      <i class="fas fa-trash"></i>
     </button>
   </div>
 </div>
