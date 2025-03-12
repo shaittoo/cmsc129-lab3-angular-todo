@@ -1,0 +1,79 @@
+<div 
+  class="task" 
+  [ngClass]="{'priority-high': task.priority === Priority.High, 
+              'priority-mid': task.priority === Priority.Mid,
+              'priority-low': task.priority === Priority.Low}"
+>
+  <div class="task-container">
+    <input
+      type="checkbox"
+      [checked]="task.completed"
+      (change)="onToggle()"
+      class="checkbox"
+    />
+    <div class="task-text" [ngClass]="{'completed': task.completed}" *ngIf="!isEditing">
+      <h3>{{ task.title }}</h3>
+      <p>Due: {{ task.dueDate }} {{ task.dueTime }}</p>
+    </div>
+    <div class="edit-form" *ngIf="isEditing">
+      <div class="form-control">
+        <input
+          type="text"
+          [(ngModel)]="editedTitle"
+          name="editedTitle"
+          class="edit-input"
+        />
+      </div>
+      <div class="form-control">
+        <input
+          type="date"
+          [(ngModel)]="editedDueDate"
+          name="editedDueDate"
+          class="edit-input"
+        />
+      </div>
+      <div class="form-control">
+        <input
+          type="time"
+          [(ngModel)]="editedDueTime"
+          name="editedDueTime"
+          class="edit-input"
+        />
+      </div>
+      <div class="form-control">
+        <select
+          [(ngModel)]="editedPriority"
+          name="editedPriority"
+          class="edit-input"
+        >
+          <option [ngValue]="Priority.High">High</option>
+          <option [ngValue]="Priority.Mid">Medium</option>
+          <option [ngValue]="Priority.Low">Low</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div>
+    <button 
+      *ngIf="!isEditing" 
+      (click)="startEditing()" 
+      class="btn"
+    >
+      Edit
+    </button>
+    <button 
+      *ngIf="isEditing" 
+      (click)="saveEdit()" 
+      class="btn"
+    >
+      Save
+    </button>
+    <button 
+      (click)="onDelete()" 
+      class="btn" 
+      style="background: red"
+    >
+      Delete
+    </button>
+  </div>
+</div>

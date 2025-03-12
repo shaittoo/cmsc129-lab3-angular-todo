@@ -1,0 +1,40 @@
+<form (ngSubmit)="onSubmit()" class="add-form">
+  <div class="form-control">
+    <label>Task</label>
+    <input
+      type="text"
+      [(ngModel)]="title"
+      name="title"
+      placeholder="Add Task"
+      required
+    />
+  </div>
+  <div class="form-control">
+    <label>Due Date</label>
+    <input
+      type="date"
+      [(ngModel)]="dueDate"
+      name="dueDate"
+    />
+  </div>
+  <div class="form-control">
+    <label>Due Time</label>
+    <input
+      type="time"
+      [(ngModel)]="dueTime"
+      name="dueTime"
+    />
+  </div>
+  <div class="form-control">
+    <label>Priority</label>
+    <select
+      [(ngModel)]="priority"
+      name="priority"
+    >
+      <option [ngValue]="Priority.High">High</option>
+      <option [ngValue]="Priority.Mid">Medium</option>
+      <option [ngValue]="Priority.Low">Low</option>
+    </select>
+  </div>
+  <input type="submit" value="Save Task" class="btn btn-block" />
+</form>
