@@ -14,12 +14,12 @@
     </div>
 
     <app-todo-item
-      *ngFor="let task of sortedTasks"
-      [task]="task"
-      (toggleComplete)="onToggleComplete($event)"
-      (deleteTask)="onDeleteTask($event)"
-      (editTask)="onEditTask($event)"
-    ></app-todo-item>
+    *ngFor="let task of sortedTasks"
+    [task]="task"
+    (toggleComplete)="onToggleComplete($event)"
+    (deleteTask)="onDeleteTask($event)"
+    (editTask)="onEditTask($event)"
+  ></app-todo-item>
 
     <div *ngIf="showToast" class="toast">
       <span>Task Deleted!</span>

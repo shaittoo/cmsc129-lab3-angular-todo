@@ -46,6 +46,7 @@ export class TodoItemComponent {
     this.editedDueDate = this.task.dueDate;
     this.editedDueTime = this.task.dueTime;
     this.editedPriority = this.task.priority;
+    console.log('Starting edit mode', this.isEditing);
   }
 
   saveEdit() {
@@ -57,6 +58,7 @@ export class TodoItemComponent {
         dueTime: this.editedDueTime,
         priority: this.editedPriority
       };
+      console.log('Saving edited task:', updatedTask);
       this.editTask.emit(updatedTask);
       this.isEditing = false;
     }
