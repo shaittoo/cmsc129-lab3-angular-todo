@@ -23,10 +23,11 @@ export class TodoListComponent implements OnInit {
 
   constructor(private taskService: TaskService) {}
 
-  ngOnInit() {
+  ngOnInit() { //loads the tasks when the component is initialized
     this.loadTasks();
   }
-
+  
+  //loads the tasks from the task service
   loadTasks() {
     this.taskService.getTasks().subscribe({
       next: (tasks) => {
@@ -42,23 +43,23 @@ export class TodoListComponent implements OnInit {
   }
 
   onAddTask(task: Task) {
-    const newTask: Task = {
-      ...task,
-      id: Date.now().toString(),
+    const newTask: Task = { 
+      ...task, //
+      id: Date.now().toString(), 
       createdAt: new Date().toISOString()
     };
     
-    console.log('Creating new task:', newTask);
+    console.log('Creating new task:', newTask); 
     
-    this.taskService.addTask(newTask).subscribe({
-      next: (savedTask) => {
-        const taskWithStringId = {
+    this.taskService.addTask(newTask).subscribe({ 
+      next: (savedTask) => { 
+        const taskWithStringId = { 
           ...savedTask,
           id: savedTask.id.toString()
         };
-        this.tasks = [...this.tasks, taskWithStringId];
-        this.sortedTasks = [...this.tasks];
-        this.sortTasks();
+        this.tasks = [...this.tasks, taskWithStringId]; //adds the new task to the tasks array
+        this.sortedTasks = [...this.tasks]; //updates the sorted tasks array
+        this.sortTasks(); 
         console.log('Task added successfully:', taskWithStringId);
       },
       error: (error) => {
@@ -67,16 +68,16 @@ export class TodoListComponent implements OnInit {
     });
   }
 
-  onToggleComplete(taskId: string | number) {
-    const stringId = taskId.toString();
-    const task = this.tasks.find(t => t.id.toString() === stringId);
+  onToggleComplete(taskId: string | number) { 
+    const stringId = taskId.toString(); 
+    const task = this.tasks.find(t => t.id.toString() === stringId); //finds the task with the matching id
     if (task) {
-      const updatedTask = { ...task, completed: !task.completed };
+      const updatedTask = { ...task, completed: !task.completed }; //updates the completed property of the task
       this.taskService.updateTask(updatedTask).subscribe({
         next: () => {
           this.tasks = this.tasks.map(t => 
-            t.id.toString() === stringId ? updatedTask : t
-          );
+            t.id.toString() === stringId ? updatedTask : t 
+          ); //updates the tasks array with the updated task
           this.sortTasks();
         },
         error: (error) => {
@@ -86,24 +87,24 @@ export class TodoListComponent implements OnInit {
     }
   }
 
-  onDeleteTask(taskId: number | string) {
-    if (confirm('Are you sure you want to delete this task?')) {
-      const stringId = taskId.toString();
-      console.log('Attempting to delete task:', stringId);
+  onDeleteTask(taskId: number | string) { 
+    if (confirm('Are you sure you want to delete this task?')) { 
+      const stringId = taskId.toString(); 
+      console.log('Attempting to delete task:', stringId); 
       
-      const taskToDelete = this.tasks.find(task => task.id.toString() === stringId);
+      const taskToDelete = this.tasks.find(task => task.id.toString() === stringId); 
       if (!taskToDelete) {
         console.error('Task not found:', stringId);
         return;
       }
 
-      const previousTasks = [...this.tasks];
+      const previousTasks = [...this.tasks]; 
       
       this.tasks = this.tasks.filter(task => task.id.toString() !== stringId);
       this.sortedTasks = this.sortedTasks.filter(task => task.id.toString() !== stringId);
       this.sortTasks();
 
-      this.taskService.deleteTask(stringId).subscribe({
+      this.taskService.deleteTask(stringId).subscribe({ 
         next: () => {
           console.log('Task deleted successfully:', stringId);
           this.showDeleteToast(taskToDelete);
@@ -118,10 +119,10 @@ export class TodoListComponent implements OnInit {
     }
   }
 
-  onEditTask(updatedTask: Task) {
+  onEditTask(updatedTask: Task) { 
     console.log('Editing task:', updatedTask);
     
-    const taskToUpdate: Task = {
+    const taskToUpdate: Task = { //creates a new task object with the edited values
       ...updatedTask,
       id: updatedTask.id.toString(),
       title: updatedTask.title.trim(),
@@ -132,13 +133,13 @@ export class TodoListComponent implements OnInit {
       createdAt: updatedTask.createdAt
     };
 
-    this.tasks = this.tasks.map(task => 
+    this.tasks = this.tasks.map(task =>  //updates the tasks array with the edited task
       task.id.toString() === taskToUpdate.id.toString() ? taskToUpdate : task
     );
     this.sortedTasks = [...this.tasks];
-    this.sortTasks();
+    this.sortTasks(); 
 
-    this.taskService.updateTask(taskToUpdate).subscribe({
+    this.taskService.updateTask(taskToUpdate).subscribe({ 
       next: () => {
         console.log('Task updated successfully');
       },
@@ -150,10 +151,10 @@ export class TodoListComponent implements OnInit {
   }
 
   sortTasks() {
-    this.sortedTasks = [...this.tasks].sort((a, b) => {
-      switch (this.sortBy) {
+    this.sortedTasks = [...this.tasks].sort((a, b) => { 
+      switch (this.sortBy) { 
         case 'dateAdded':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); 
         case 'dueDate':
           return new Date(`${a.dueDate} ${a.dueTime}`).getTime() - 
                  new Date(`${b.dueDate} ${b.dueTime}`).getTime();
@@ -190,9 +191,30 @@ export class TodoListComponent implements OnInit {
 
   undoDelete() {
     if (this.lastDeletedTask) {
-      this.tasks = [...this.tasks, this.lastDeletedTask];
-      this.sortTasks();
-      this.hideToast();
+      // First, try to add the task back to the database
+      this.taskService.addTask(this.lastDeletedTask).subscribe({
+        next: (restoredTask) => {
+          // On success, update the UI with the restored task
+          const taskWithStringId = {
+            ...restoredTask,
+            id: restoredTask.id.toString()
+          };
+          
+          this.tasks = [...this.tasks, taskWithStringId];
+          this.sortedTasks = [...this.tasks];
+          this.sortTasks();
+          
+          //clear the toast
+          this.hideToast();
+          
+          console.log('Task restored successfully:', taskWithStringId);
+        },
+        error: (error) => {
+          console.error('Error restoring task:', error);
+          alert('Failed to restore task. Please try again.');
+          this.hideToast();
+        }
+      });
     }
   }
 }

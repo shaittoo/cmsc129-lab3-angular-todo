@@ -8,7 +8,6 @@ import { Task } from '../models/task';
   providedIn: 'root'
 })
 export class TaskService {
-  // Make sure this URL matches your JSON Server
   private apiUrl = 'http://localhost:3000/tasks';
   
   constructor(private http: HttpClient) {}
@@ -19,6 +18,7 @@ export class TaskService {
     })
   };
 
+   
   getTasks(): Observable<Task[]> {
     return this.http.get<Task[]>(this.apiUrl).pipe(
       tap(tasks => console.log('Fetched tasks:', tasks)),

@@ -1,11 +1,11 @@
 <div>
-    <app-todo-form (addTask)="onAddTask($event)"></app-todo-form>
+    <app-todo-form (addTask)="onAddTask($event)"></app-todo-form> <!--adds a new task-->
     
     <div class="sort-container">
       <label class="sort-label">Sort by:</label>
       <select 
         [(ngModel)]="sortBy" 
-        (change)="sortTasks()"
+        (change)="sortTasks()"  
       >
         <option value="dateAdded">Date Added</option>
         <option value="dueDate">Due Date</option>
@@ -13,15 +13,16 @@
       </select>
     </div>
 
+    <!--displays each task item-->
     <app-todo-item
     *ngFor="let task of sortedTasks"
     [task]="task"
     (toggleComplete)="onToggleComplete($event)"
-    (deleteTask)="onDeleteTask($event)"
-    (editTask)="onEditTask($event)"
+    (deleteTask)="onDeleteTask($event)" 
+    (editTask)="onEditTask($event)" 
   ></app-todo-item>
 
-    <div *ngIf="showToast" class="toast">
+    <div *ngIf="showToast" class="toast"> 
       <span>Task Deleted!</span>
       <button 
         (click)="undoDelete()"

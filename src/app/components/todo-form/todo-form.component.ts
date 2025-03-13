@@ -13,6 +13,7 @@ import { Task, Priority } from '../../models/task';
 export class TodoFormComponent {
   @Output() addTask = new EventEmitter<Task>();
   
+  //form field properties with initial values
   Priority = Priority;
   title: string = '';
   dueDate: string = '';
@@ -36,6 +37,7 @@ export class TodoFormComponent {
     }
   }
 
+  //reset form fields to empty values
   private resetForm() {
     this.title = '';
     this.dueDate = '';

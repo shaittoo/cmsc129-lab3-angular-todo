@@ -16,6 +16,7 @@ export class TodoItemComponent {
   @Output() deleteTask = new EventEmitter<string | number>();
   @Output() editTask = new EventEmitter<Task>();
 
+  //tracks the edited values
   Priority = Priority;
   isEditing = false;
   editedTitle = '';
@@ -32,14 +33,17 @@ export class TodoItemComponent {
     };
   }
 
+  //emits the task id when the checkbox is toggled
   onToggle() {
     this.toggleComplete.emit(this.task.id);
   }
 
+  //emits the task id when the delete button is clicked
   onDelete() {
     this.deleteTask.emit(this.task.id);
   }
 
+  //starts the editing mode
   startEditing() {
     this.isEditing = true;
     this.editedTitle = this.task.title;
@@ -49,9 +53,10 @@ export class TodoItemComponent {
     console.log('Starting edit mode', this.isEditing);
   }
 
+  //saves the edited task
   saveEdit() {
     if (this.editedTitle.trim()) {
-      const updatedTask: Task = {
+      const updatedTask: Task = { //creates a new task object with the edited values
         ...this.task,
         title: this.editedTitle.trim(),
         dueDate: this.editedDueDate,
