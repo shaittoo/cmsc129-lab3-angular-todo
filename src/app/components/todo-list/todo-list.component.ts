@@ -191,10 +191,9 @@ export class TodoListComponent implements OnInit {
 
   undoDelete() {
     if (this.lastDeletedTask) {
-      // First, try to add the task back to the database
+      //add the task back to the database
       this.taskService.addTask(this.lastDeletedTask).subscribe({
         next: (restoredTask) => {
-          // On success, update the UI with the restored task
           const taskWithStringId = {
             ...restoredTask,
             id: restoredTask.id.toString()
